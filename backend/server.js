@@ -1,27 +1,29 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const recurly = require('recurly');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Recurly Configuration
-// TODO: Replace with your actual Recurly subdomain
-const RECURLY_SUBDOMAIN = 'YOUR_SUBDOMAIN'; // e.g., 'mycompany'
+const RECURLY_SUBDOMAIN = process.env.RECURLY_SUBDOMAIN;
 
 // Initialize Recurly client
-const client = new recurly.Client('e82b4caaf1e24964a1ce22588840b921'); // Your private API key
+const client = new recurly.Client(process.env.RECURLY_PRIVATE_KEY);
 
 // Endpoint to create a subscription
 app.post('/api/subscribe', async (req, res) => {
     try {
-        const { token, planCode, email, firstName, lastName } = req.body;
+        const { token, planCode, email, firstName, lastName, address1, city, state, postalCode, country } = req.body;
 
         console.log('Creating subscription:', { planCode, email });
 
@@ -35,6 +37,13 @@ app.post('/api/subscribe', async (req, res) => {
                 email: email,
                 firstName: firstName || 'Customer',
                 lastName: lastName || 'User',
+                address: {
+                    street1: address1,
+                    city: city,
+                    region: state,
+                    postalCode: postalCode,
+                    country: country,
+                },
                 billingInfo: {
                     tokenId: token,
                 },
@@ -80,7 +89,9 @@ app.get('/api/health', (req, res) => {
 
 // Serve the payment page
 app.get('/payment.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'payment.html'));
+    res.render('payment', {
+        publicKey: process.env.RECURLY_PUBLIC_KEY
+    });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

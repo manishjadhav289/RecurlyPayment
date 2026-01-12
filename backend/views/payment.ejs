@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -156,7 +157,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .error-message {
@@ -199,6 +202,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="payment-container">
     <div class="header">
@@ -218,6 +222,33 @@
         <div class="form-group">
           <label>Last Name</label>
           <input type="text" id="lastName" placeholder="Doe" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Address 1</label>
+        <input type="text" id="address1" placeholder="123 Main St" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" id="city" placeholder="San Francisco" required>
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          <input type="text" id="state" placeholder="CA" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Country (ISO 2-letter code)</label>
+          <input type="text" id="country" placeholder="US" maxlength="2" required>
+        </div>
+        <div class="form-group">
+          <label>Postal Code</label>
+          <input type="text" id="postalCode" placeholder="94107" required>
         </div>
       </div>
 
@@ -253,7 +284,8 @@
 
     <div class="secure-badge">
       <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+        <path
+          d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
       </svg>
       Secured by Recurly
     </div>
@@ -275,7 +307,7 @@
     // Initialize Recurly
     // TODO: Replace with your public key
     recurly.configure({
-      publicKey: 'ewr1-a5dZLklS5YZe0BinMu4ral'
+      publicKey: '<%= publicKey %>'
     });
 
     // Create Recurly Elements
@@ -315,10 +347,10 @@
 
     // Add focus/blur styling
     [cardNumber, cardMonth, cardYear, cardCvv].forEach(element => {
-      element.on('focus', function() {
+      element.on('focus', function () {
         this.container.classList.add('recurly-element-focus');
       });
-      element.on('blur', function() {
+      element.on('blur', function () {
         this.container.classList.remove('recurly-element-focus');
       });
     });
@@ -328,7 +360,7 @@
     const payButton = document.getElementById('payButton');
     const errorMessage = document.getElementById('errorMessage');
 
-    form.addEventListener('submit', async function(event) {
+    form.addEventListener('submit', async function (event) {
       event.preventDefault();
 
       payButton.disabled = true;
@@ -337,6 +369,11 @@
 
       const firstName = document.getElementById('firstName').value;
       const lastName = document.getElementById('lastName').value;
+      const address1 = document.getElementById('address1').value;
+      const city = document.getElementById('city').value;
+      const state = document.getElementById('state').value;
+      const country = document.getElementById('country').value;
+      const postalCode = document.getElementById('postalCode').value;
       const email = document.getElementById('email').value;
 
       try {
@@ -344,8 +381,13 @@
         const token = await new Promise((resolve, reject) => {
           recurly.token(elements, {
             first_name: firstName,
-            last_name: lastName
-          }, function(err, token) {
+            last_name: lastName,
+            address1: address1,
+            city: city,
+            state: state,
+            country: country,
+            postal_code: postalCode
+          }, function (err, token) {
             if (err) {
               reject(err);
             } else {
@@ -368,6 +410,11 @@
             email: email,
             firstName: firstName,
             lastName: lastName,
+            address1: address1,
+            city: city,
+            state: state,
+            country: country,
+            postalCode: postalCode
           }),
         });
 
@@ -404,7 +451,7 @@
     });
 
     // Cancel link
-    document.getElementById('cancelLink').addEventListener('click', function(e) {
+    document.getElementById('cancelLink').addEventListener('click', function (e) {
       e.preventDefault();
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -416,4 +463,5 @@
     });
   </script>
 </body>
+
 </html>

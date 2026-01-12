@@ -17,7 +17,7 @@ type PaymentScreenProps = {
 };
 
 // TODO: Replace with your actual backend URL
-const BACKEND_URL = 'http://10.0.2.2:3000'; // Android emulator localhost
+const BACKEND_URL = 'http://10.0.2.2:3001'; // Android emulator localhost
 
 export default function PaymentScreen({
     navigation,
